@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>戴律师律所数字运营系统 - 建设方案</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+            colors: {
+              brand: {
+                dark: "#0f172a", // Slate 900
+                primary: "#0ea5e9", // Sky 500
+                secondary: "#6366f1", // Indigo 500
+                accent: "#22d3ee", // Cyan 400
+                surface: "#1e293b", // Slate 800
+              },
+            },
+            animation: {
+              "fade-in-up": "fadeInUp 0.8s ease-out forwards",
+              "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+            },
+            keyframes: {
+              fadeInUp: {
+                "0%": { opacity: "0", transform: "translateY(20px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        background-color: #0f172a;
+        color: #e2e8f0;
+        overflow-x: hidden;
+      }
+      .glass-card {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .gradient-text {
+        background: linear-gradient(135deg, #22d3ee 0%, #6366f1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .hero-bg {
+        background: radial-gradient(
+          circle at 50% 50%,
+          rgba(99, 102, 241, 0.15) 0%,
+          rgba(15, 23, 42, 0) 50%
+        );
+      }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0f172a;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #475569;
+      }
+      
+      /* Access Code Overlay Styles */
+      #access-overlay {
+          transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+      }
+      .shake {
+          animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+      }
+      @keyframes shake {
+          10%, 90% { transform: translate3d(-1px, 0, 0); }
+          20%, 80% { transform: translate3d(2px, 0, 0); }
+          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+          40%, 60% { transform: translate3d(4px, 0, 0); }
+      }
+    </style>
+  </head>
+  <body class="antialiased overflow-hidden">
+
+    <!-- Access Code Overlay -->
+    <div id="access-overlay" class="fixed inset-0 z-[100] bg-slate-900/95 backdrop-blur-xl flex items-center justify-center">
+        <div class="max-w-md w-full mx-4 p-8 glass-card rounded-2xl text-center shadow-2xl border border-brand-primary/20">
+            <div class="w-16 h-16 mx-auto bg-brand-primary/20 rounded-full flex items-center justify-center mb-6 animate-pulse">
+                <i class="fa-solid fa-lock text-brand-accent text-3xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-2">专属方案访问</h2>
+            <p class="text-slate-400 text-sm mb-8">请输入访问码以解锁查看完整方案内容</p>
+            
+            <div class="space-y-4">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-key text-slate-500"></i>
+                    </div>
+                    <input type="password" id="access-code" 
+                        class="block w-full pl-10 pr-3 py-3 border border-slate-600 rounded-lg leading-5 bg-slate-800 text-slate-300 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary sm:text-sm transition-all" 
+                        placeholder="请输入访问码"
+                        onkeypress="if(event.key === 'Enter') verifyCode()">
+                </div>
+                <button onclick="verifyCode()" 
+                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-brand-primary to-brand-secondary hover:from-brand-primary/90 hover:to-brand-secondary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary transition-all transform hover:-translate-y-0.5">
+                    解锁方案
+                </button>
+                <p id="error-msg" class="text-red-400 text-xs h-4 opacity-0 transition-opacity">访问码错误，请重试</p>
+            </div>
+            
+            <div class="mt-8 pt-6 border-t border-slate-700/50">
+                <p class="text-slate-500 text-xs">戴律师律所数字运营系统 · 2025</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function verifyCode() {
+            const codeInput = document.getElementById('access-code');
+            const errorMsg = document.getElementById('error-msg');
+            const overlay = document.getElementById('access-overlay');
+            const code = codeInput.value.trim();
+            
+            // Hardcoded access code
+            if (code === '8888') {
+                // Success
+                overlay.style.opacity = '0';
+                overlay.style.visibility = 'hidden';
+                document.body.classList.remove('overflow-hidden');
+                
+                // Trigger initial animations for hero section after unlock
+                const heroElements = document.querySelectorAll('.hero-bg .animate-fade-in-up');
+                heroElements.forEach(el => {
+                    el.style.animationPlayState = 'running';
+                });
+            } else {
+                // Failure
+                errorMsg.style.opacity = '1';
+                codeInput.parentElement.classList.add('shake');
+                codeInput.classList.add('border-red-500');
+                
+                setTimeout(() => {
+                    codeInput.parentElement.classList.remove('shake');
+                    codeInput.classList.remove('border-red-500');
+                }, 500);
+            }
+        }
+    </script>
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-card border-b border-slate-700/50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <i
+                class="fa-solid fa-scale-balanced text-brand-accent text-2xl mr-2"
+              ></i>
+              <span class="font-bold text-xl tracking-tight text-white"
+                >律所数字运营系统</span
+              >
+            </div>
+          </div>
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-4">
+              <a
+                href="#goals"
+                class="hover:text-brand-accent px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                >目标</a
+              >
+              <a
+                href="#architecture"
+                class="hover:text-brand-accent px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                >架构</a
+              >
+              <a
+                href="#modules"
+                class="hover:text-brand-accent px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                >功能</a
+              >
+              <a
+                href="#quote"
+                class="bg-brand-primary/20 text-brand-accent border border-brand-primary/50 hover:bg-brand-primary/30 px-4 py-2 rounded-full text-sm font-medium transition-all"
+                >方案报价</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section
+      class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden hero-bg"
+    >
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center"
+      >
+        <div
+          class="inline-flex items-center px-3 py-1 rounded-full border border-brand-accent/30 bg-brand-accent/10 text-brand-accent text-xs font-medium mb-6 animate-fade-in-up"
+          style="animation-delay: 0.1s"
+        >
+          一期建设方案 · 标准版 · 云部署
+        </div>
+        <h1
+          class="text-4xl md:text-6xl font-bold tracking-tight mb-6 animate-fade-in-up"
+          style="animation-delay: 0.2s"
+        >
+          <span class="block text-white">戴律师律所</span>
+          <span class="block gradient-text mt-2">数字运营系统</span>
+        </h1>
+        <p
+          class="mt-4 max-w-2xl mx-auto text-xl text-slate-400 animate-fade-in-up"
+          style="animation-delay: 0.3s"
+        >
+          打破信息孤岛，AI 赋能法律文书，构建数字化、智能化的现代律所运营底座。
+        </p>
+        <div
+          class="mt-10 flex justify-center gap-4 animate-fade-in-up"
+          style="animation-delay: 0.4s"
+        >
+          <a
+            href="#modules"
+            class="px-8 py-3 rounded-lg bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-semibold shadow-lg shadow-brand-primary/25 hover:shadow-brand-primary/40 transition-all transform hover:-translate-y-1"
+          >
+            查看核心功能
+          </a>
+          <a
+            href="#architecture"
+            class="px-8 py-3 rounded-lg glass-card text-white font-semibold hover:bg-slate-800 transition-all"
+          >
+            了解技术架构
+          </a>
+        </div>
+      </div>
+
+      <!-- Decorative Elements -->
+      <div
+        class="absolute top-1/4 left-10 w-72 h-72 bg-brand-primary/20 rounded-full blur-3xl -z-10 animate-pulse-slow"
+      ></div>
+      <div
+        class="absolute bottom-1/4 right-10 w-96 h-96 bg-brand-secondary/20 rounded-full blur-3xl -z-10 animate-pulse-slow"
+        style="animation-delay: 2s"
+      ></div>
+    </section>
+
+    <!-- Pain Points & Goals -->
+    <section id="goals" class="py-20 bg-slate-900/50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl font-bold text-white">项目背景与目标</h2>
+          <p class="mt-4 text-slate-400">
+            针对律所运营痛点，打造全流程数字化解决方案
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+          <!-- Pain Points -->
+          <div class="space-y-6">
+            <h3
+              class="text-xl font-semibold text-red-400 mb-6 flex items-center"
+            >
+              <i class="fa-solid fa-triangle-exclamation mr-3"></i> 当前痛点
+            </h3>
+            <div
+              class="glass-card p-6 rounded-xl border-l-4 border-red-500/50 hover:bg-slate-800/50 transition-colors"
+            >
+              <h4 class="font-medium text-white mb-2">案件材料分散</h4>
+              <p class="text-sm text-slate-400">
+                卷宗、证据、文书散落在不同电脑和微信聊天记录中，查找困难。
+              </p>
+            </div>
+            <div
+              class="glass-card p-6 rounded-xl border-l-4 border-red-500/50 hover:bg-slate-800/50 transition-colors"
+            >
+              <h4 class="font-medium text-white mb-2">文书撰写耗时</h4>
+              <p class="text-sm text-slate-400">
+                重复性劳动多，公众号文章、合同初审等工作占用大量律师时间。
+              </p>
+            </div>
+            <div
+              class="glass-card p-6 rounded-xl border-l-4 border-red-500/50 hover:bg-slate-800/50 transition-colors"
+            >
+              <h4 class="font-medium text-white mb-2">财务核算复杂</h4>
+              <p class="text-sm text-slate-400">
+                提成规则多样，人工统计容易出错，缺乏透明度。
+              </p>
+            </div>
+          </div>
+
+          <!-- Solutions -->
+          <div class="space-y-6">
+            <h3
+              class="text-xl font-semibold text-brand-accent mb-6 flex items-center"
+            >
+              <i class="fa-solid fa-bullseye mr-3"></i> 建设目标
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div
+                class="glass-card p-5 rounded-xl text-center hover:border-brand-accent/50 transition-all group"
+              >
+                <div
+                  class="w-12 h-12 mx-auto bg-brand-primary/20 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"
+                >
+                  <i class="fa-solid fa-folder-tree text-brand-accent"></i>
+                </div>
+                <h4 class="font-medium text-white">结构化管理</h4>
+                <p class="text-xs text-slate-400 mt-2">案件与文书集中归档</p>
+              </div>
+              <div
+                class="glass-card p-5 rounded-xl text-center hover:border-brand-accent/50 transition-all group"
+              >
+                <div
+                  class="w-12 h-12 mx-auto bg-brand-primary/20 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"
+                >
+                  <i
+                    class="fa-solid fa-wand-magic-sparkles text-brand-accent"
+                  ></i>
+                </div>
+                <h4 class="font-medium text-white">AI 辅助撰写</h4>
+                <p class="text-xs text-slate-400 mt-2">
+                  文书/文章/合同智能生成
+                </p>
+              </div>
+              <div
+                class="glass-card p-5 rounded-xl text-center hover:border-brand-accent/50 transition-all group"
+              >
+                <div
+                  class="w-12 h-12 mx-auto bg-brand-primary/20 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"
+                >
+                  <i class="fa-solid fa-handshake text-brand-accent"></i>
+                </div>
+                <h4 class="font-medium text-white">案源数字化</h4>
+                <p class="text-xs text-slate-400 mt-2">全流程跟踪客户拜访</p>
+              </div>
+              <div
+                class="glass-card p-5 rounded-xl text-center hover:border-brand-accent/50 transition-all group"
+              >
+                <div
+                  class="w-12 h-12 mx-auto bg-brand-primary/20 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"
+                >
+                  <i class="fa-solid fa-calculator text-brand-accent"></i>
+                </div>
+                <h4 class="font-medium text-white">自动核算</h4>
+                <p class="text-xs text-slate-400 mt-2">财务提成精准计算</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture -->
+    <section id="architecture" class="py-20 relative overflow-hidden">
+      <div
+        class="absolute inset-0 bg-brand-primary/5 -skew-y-3 transform origin-top-left z-0"
+      ></div>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl font-bold text-white">云端部署与整体架构</h2>
+          <p class="mt-4 text-slate-400">安全、稳定、可扩展的技术底座</p>
+        </div>
+
+        <div class="glass-card p-8 rounded-2xl border border-slate-700">
+          <div
+            class="flex flex-col lg:flex-row gap-8 items-center justify-center"
+          >
+            <!-- Cloud Environment -->
+            <div class="flex-1 w-full">
+              <div
+                class="border-2 border-dashed border-slate-600 rounded-xl p-6 relative"
+              >
+                <span
+                  class="absolute -top-3 left-4 bg-slate-800 px-2 text-xs text-slate-400"
+                  >专有网络 VPC</span
+                >
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <!-- App Server -->
+                  <div
+                    class="bg-slate-800 p-4 rounded-lg border border-slate-700 text-center"
+                  >
+                    <i
+                      class="fa-solid fa-server text-brand-primary text-2xl mb-2"
+                    ></i>
+                    <h4 class="font-bold text-white">Web 应用服务</h4>
+                    <p class="text-xs text-slate-400">业务逻辑处理</p>
+                  </div>
+                  <!-- DB -->
+                  <div
+                    class="bg-slate-800 p-4 rounded-lg border border-slate-700 text-center"
+                  >
+                    <i
+                      class="fa-solid fa-database text-brand-secondary text-2xl mb-2"
+                    ></i>
+                    <h4 class="font-bold text-white">关系型数据库</h4>
+                    <p class="text-xs text-slate-400">核心业务数据</p>
+                  </div>
+                  <!-- Object Storage -->
+                  <div
+                    class="bg-slate-800 p-4 rounded-lg border border-slate-700 text-center"
+                  >
+                    <i
+                      class="fa-solid fa-box-archive text-yellow-500 text-2xl mb-2"
+                    ></i>
+                    <h4 class="font-bold text-white">对象存储 OSS</h4>
+                    <p class="text-xs text-slate-400">文档/合同/材料</p>
+                  </div>
+                  <!-- Workflow -->
+                  <div
+                    class="bg-slate-800 p-4 rounded-lg border border-slate-700 text-center"
+                  >
+                    <i
+                      class="fa-solid fa-network-wired text-green-500 text-2xl mb-2"
+                    ></i>
+                    <h4 class="font-bold text-white">n8n 工作流</h4>
+                    <p class="text-xs text-slate-400">流程编排与自动化</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Connection -->
+            <div class="hidden lg:flex flex-col items-center text-slate-500">
+              <i
+                class="fa-solid fa-arrow-right-arrow-left text-2xl animate-pulse"
+              ></i>
+              <span class="text-xs mt-2">API 调用</span>
+            </div>
+
+            <!-- AI Layer -->
+            <div class="lg:w-1/4 w-full">
+              <div
+                class="bg-gradient-to-br from-brand-primary/20 to-brand-secondary/20 border border-brand-accent/30 rounded-xl p-6 text-center relative overflow-hidden"
+              >
+                <div
+                  class="absolute inset-0 bg-brand-accent/5 animate-pulse"
+                ></div>
+                <i
+                  class="fa-solid fa-robot text-4xl text-brand-accent mb-4 relative z-10"
+                ></i>
+                <h3 class="text-xl font-bold text-white relative z-10">
+                  AI 能力层
+                </h3>
+                <div class="mt-4 space-y-2 relative z-10">
+                  <div
+                    class="bg-slate-900/50 rounded px-2 py-1 text-xs text-slate-300"
+                  >
+                    DeepSeek
+                  </div>
+                  <div
+                    class="bg-slate-900/50 rounded px-2 py-1 text-xs text-slate-300"
+                  >
+                    通义千问
+                  </div>
+                </div>
+                <p class="mt-4 text-xs text-slate-400 relative z-10">
+                  文书摘要 · 风险审核 · 写作辅助
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-6 text-center">
+            <span
+              class="inline-flex items-center px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-xs border border-green-500/20"
+            >
+              <i class="fa-solid fa-shield-halved mr-2"></i>
+              数据安全：敏感内容私有化存储，加密审计
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Core Modules -->
+    <section id="modules" class="py-20 bg-slate-900">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl font-bold text-white">一期核心功能模块</h2>
+          <p class="mt-4 text-slate-400">六大模块，全面覆盖律所运营核心场景</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Module 1 -->
+          <div
+            class="glass-card rounded-xl overflow-hidden hover:shadow-2xl hover:shadow-brand-primary/10 transition-all group"
+          >
+            <div class="h-2 bg-brand-primary"></div>
+            <div class="p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-white">案件与内容管理</h3>
+                <i
+                  class="fa-solid fa-file-contract text-brand-primary text-2xl group-hover:scale-110 transition-transform"
+                ></i>
+              </div>
+              <ul class="space-y-3 text-sm text-slate-300">
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>文书结构化归档与检索</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>AI 自动摘要与标签提取</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>一键生成公众号/视频脚本</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>内容多版本流转与审核</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Module 2 -->
+          <div
+            class="glass-card rounded-xl overflow-hidden hover:shadow-2xl hover:shadow-brand-primary/10 transition-all group"
+          >
+            <div class="h-2 bg-brand-secondary"></div>
+            <div class="p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-white">团队档案 & 荣誉</h3>
+                <i
+                  class="fa-solid fa-user-tie text-brand-secondary text-2xl group-hover:scale-110 transition-transform"
+                ></i>
+              </div>
+              <ul class="space-y-3 text-sm text-slate-300">
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>律师履历资产库管理</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>奖项/职务申报历史记录</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>投标文书模板结构化</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>AI 自动填充申报材料草稿</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Module 3 -->
+          <div
+            class="glass-card rounded-xl overflow-hidden hover:shadow-2xl hover:shadow-brand-primary/10 transition-all group"
+          >
+            <div class="h-2 bg-pink-500"></div>
+            <div class="p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-white">案源 & 客户 CRM</h3>
+                <i
+                  class="fa-solid fa-users text-pink-500 text-2xl group-hover:scale-110 transition-transform"
+                ></i>
+              </div>
+              <ul class="space-y-3 text-sm text-slate-300">
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>客户与线索全生命周期管理</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>移动端语音录入拜访记录</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>AI 总结沟通要点与跟进提醒</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>案源漏斗与转化率统计</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Module 4 -->
+          <div
+            class="glass-card rounded-xl overflow-hidden hover:shadow-2xl hover:shadow-brand-primary/10 transition-all group"
+          >
+            <div class="h-2 bg-green-500"></div>
+            <div class="p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-white">财务 & 提成核算</h3>
+                <i
+                  class="fa-solid fa-chart-pie text-green-500 text-2xl group-hover:scale-110 transition-transform"
+                ></i>
+              </div>
+              <ul class="space-y-3 text-sm text-slate-300">
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>案件收入与回款记录</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>自定义提成规则与公式</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>月度工资/提成/补贴自动结算</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>多维度财务报表导出</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Module 5 -->
+          <div
+            class="glass-card rounded-xl overflow-hidden hover:shadow-2xl hover:shadow-brand-primary/10 transition-all group"
+          >
+            <div class="h-2 bg-purple-500"></div>
+            <div class="p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-white">AI 合同助手</h3>
+                <i
+                  class="fa-solid fa-wand-sparkles text-purple-500 text-2xl group-hover:scale-110 transition-transform"
+                ></i>
+              </div>
+              <ul class="space-y-3 text-sm text-slate-300">
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>合同条款自动切分与解析</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>高风险条款智能识别与提示</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>按立场（甲/乙）生成改写建议</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>前后版本差异对比与审计</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Module 6 -->
+          <div
+            class="glass-card rounded-xl overflow-hidden hover:shadow-2xl hover:shadow-brand-primary/10 transition-all group"
+          >
+            <div class="h-2 bg-slate-500"></div>
+            <div class="p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-white">系统底座</h3>
+                <i
+                  class="fa-solid fa-layer-group text-slate-500 text-2xl group-hover:scale-110 transition-transform"
+                ></i>
+              </div>
+              <ul class="space-y-3 text-sm text-slate-300">
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>RBAC 角色权限管理</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>全链路操作日志审计</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>业务规则与 AI 策略配置中心</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fa-solid fa-check text-brand-accent mt-1 mr-2"></i>
+                  <span>基础数据报表</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Delivery & Quote -->
+    <section id="quote" class="py-20 relative">
+      <div
+        class="absolute inset-0 bg-gradient-to-b from-slate-900 to-brand-dark"
+      ></div>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <!-- Timeline -->
+        <div class="mb-20">
+          <h2 class="text-3xl font-bold text-white text-center mb-12">
+            实施周期与交付
+          </h2>
+          <div class="relative">
+            <div
+              class="absolute left-0 top-1/2 w-full h-1 bg-slate-700 -translate-y-1/2 hidden md:block"
+            ></div>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div
+                class="relative text-center bg-slate-800 md:bg-transparent p-4 rounded-lg z-10"
+              >
+                <div
+                  class="w-8 h-8 bg-brand-primary rounded-full mx-auto mb-3 flex items-center justify-center text-white font-bold shadow-lg shadow-brand-primary/50"
+                >
+                  1
+                </div>
+                <h4 class="text-white font-medium">需求梳理</h4>
+              </div>
+              <div
+                class="relative text-center bg-slate-800 md:bg-transparent p-4 rounded-lg z-10"
+              >
+                <div
+                  class="w-8 h-8 bg-brand-primary rounded-full mx-auto mb-3 flex items-center justify-center text-white font-bold shadow-lg shadow-brand-primary/50"
+                >
+                  2
+                </div>
+                <h4 class="text-white font-medium">详细设计</h4>
+              </div>
+              <div
+                class="relative text-center bg-slate-800 md:bg-transparent p-4 rounded-lg z-10"
+              >
+                <div
+                  class="w-8 h-8 bg-brand-primary rounded-full mx-auto mb-3 flex items-center justify-center text-white font-bold shadow-lg shadow-brand-primary/50"
+                >
+                  3
+                </div>
+                <h4 class="text-white font-medium">开发实现</h4>
+              </div>
+              <div
+                class="relative text-center bg-slate-800 md:bg-transparent p-4 rounded-lg z-10"
+              >
+                <div
+                  class="w-8 h-8 bg-brand-primary rounded-full mx-auto mb-3 flex items-center justify-center text-white font-bold shadow-lg shadow-brand-primary/50"
+                >
+                  4
+                </div>
+                <h4 class="text-white font-medium">联调测试</h4>
+              </div>
+              <div
+                class="relative text-center bg-slate-800 md:bg-transparent p-4 rounded-lg z-10"
+              >
+                <div
+                  class="w-8 h-8 bg-green-500 rounded-full mx-auto mb-3 flex items-center justify-center text-white font-bold shadow-lg shadow-green-500/50"
+                >
+                  5
+                </div>
+                <h4 class="text-white font-medium">试运行</h4>
+              </div>
+            </div>
+            <p class="text-center text-slate-400 mt-8">
+              整体周期预计：4 - 6 个月
+            </p>
+          </div>
+        </div>
+
+        <!-- Pricing -->
+        <div class="max-w-4xl mx-auto">
+          <div
+            class="glass-card rounded-2xl p-1 bg-gradient-to-b from-slate-700 to-slate-800"
+          >
+            <div class="bg-slate-900 rounded-xl p-8 md:p-12">
+              <div class="text-center mb-8">
+                <h3 class="text-2xl font-bold text-white">一期项目报价区间</h3>
+                <p class="text-slate-400 mt-2">标准版 · 云部署</p>
+              </div>
+
+              <div class="space-y-6">
+                <div
+                  class="flex flex-col md:flex-row justify-between items-center border-b border-slate-800 pb-6"
+                >
+                  <div>
+                    <h4 class="text-lg font-semibold text-white">
+                      软件开发与测试
+                    </h4>
+                    <p class="text-sm text-slate-500">
+                      覆盖全部标准版功能，约 18-20 人月
+                    </p>
+                  </div>
+                  <div class="text-xl font-bold text-brand-accent mt-2 md:mt-0">
+                    ¥ 75 - 100 万
+                  </div>
+                </div>
+                <div
+                  class="flex flex-col md:flex-row justify-between items-center border-b border-slate-800 pb-6"
+                >
+                  <div>
+                    <h4 class="text-lg font-semibold text-white">
+                      云端部署与实施
+                    </h4>
+                    <p class="text-sm text-slate-500">
+                      环境搭建、安全策略、联合测试
+                    </p>
+                  </div>
+                  <div class="text-xl font-bold text-brand-accent mt-2 md:mt-0">
+                    ¥ 3 - 5 万
+                  </div>
+                </div>
+                <div
+                  class="flex flex-col md:flex-row justify-between items-center border-b border-slate-800 pb-6"
+                >
+                  <div>
+                    <h4 class="text-lg font-semibold text-white">
+                      培训与文档服务
+                    </h4>
+                    <p class="text-sm text-slate-500">
+                      多角色培训、操作手册交付
+                    </p>
+                  </div>
+                  <div class="text-xl font-bold text-brand-accent mt-2 md:mt-0">
+                    ¥ 3 - 5 万
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="mt-10 bg-brand-primary/10 rounded-xl p-6 text-center border border-brand-primary/20"
+              >
+                <p class="text-slate-400 text-sm mb-2">总预算建议区间</p>
+                <div class="text-4xl font-bold text-white mb-2">
+                  ¥ 85 - 110 万
+                </div>
+                <p class="text-xs text-slate-500">
+                  * 不含云资源及模型 API 费用
+                </p>
+              </div>
+
+              <div class="mt-8 text-xs text-slate-500 text-center">
+                <p class="mb-2">
+                  <i class="fa-solid fa-circle-info mr-1"></i>
+                  云资源成本参考：服务器/数据库等约数千元/月
+                </p>
+                <p>
+                  <i class="fa-solid fa-circle-info mr-1"></i> 模型 API
+                  成本参考：试运行阶段约数千至一万元/月
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 py-12 border-t border-slate-900">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center"
+      >
+        <div class="mb-4 md:mb-0">
+          <span class="font-bold text-xl tracking-tight text-white"
+            >律所数字运营系统</span
+          >
+          <p class="text-slate-500 text-sm mt-1">赋能法律行业数字化转型</p>
+        </div>
+        <div class="text-slate-500 text-sm">
+          &copy; 2025 方案建议书. All rights reserved.
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Simple scroll animation observer
+      document.addEventListener("DOMContentLoaded", () => {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.style.animationPlayState = "running";
+              observer.unobserve(entry.target);
+            }
+          });
+        });
+
+        // Elements that are not already animated by the initial load
+        // You can add more complex logic here if needed
+      });
+    </script>
+  </body>
+</html>

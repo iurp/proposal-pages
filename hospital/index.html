@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧医疗 AI 慢病管理系统 - 建设方案</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        medical: {
+                            primary: '#0d9488', // Teal 600
+                            secondary: '#0ea5e9', // Sky 500
+                            accent: '#2dd4bf', // Teal 400
+                            dark: '#111827', // Gray 900
+                            light: '#f0fdfa', // Teal 50
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #0d9488 0%, #0ea5e9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-bg {
+            background: radial-gradient(circle at 50% 50%, rgba(13, 148, 136, 0.05) 0%, rgba(248, 250, 252, 0) 60%);
+        }
+        
+        /* Access Code Overlay Styles */
+        #access-overlay {
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+    </style>
+</head>
+<body class="antialiased overflow-hidden">
+
+    <!-- Access Code Overlay -->
+    <div id="access-overlay" class="fixed inset-0 z-[100] bg-white/90 backdrop-blur-xl flex items-center justify-center">
+        <div class="max-w-md w-full mx-4 p-8 glass-card rounded-2xl text-center shadow-2xl border border-medical-primary/20">
+            <div class="w-16 h-16 mx-auto bg-medical-primary/10 rounded-full flex items-center justify-center mb-6 animate-pulse">
+                <i class="fa-solid fa-user-doctor text-medical-primary text-3xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">智慧医疗方案访问</h2>
+            <p class="text-slate-500 text-sm mb-8">请输入访问码以解锁查看完整方案内容</p>
+            
+            <div class="space-y-4">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-key text-slate-400"></i>
+                    </div>
+                    <input type="password" id="access-code" 
+                        class="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-lg leading-5 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-medical-primary focus:border-medical-primary sm:text-sm transition-all shadow-sm" 
+                        placeholder="请输入访问码"
+                        onkeypress="if(event.key === 'Enter') verifyCode()">
+                </div>
+                <button onclick="verifyCode()" 
+                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-medical-primary to-medical-secondary hover:from-medical-primary/90 hover:to-medical-secondary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-medical-primary transition-all transform hover:-translate-y-0.5">
+                    解锁方案
+                </button>
+                <p id="error-msg" class="text-red-500 text-xs h-4 opacity-0 transition-opacity">访问码错误，请重试</p>
+            </div>
+            
+            <div class="mt-8 pt-6 border-t border-slate-200">
+                <p class="text-slate-400 text-xs">智慧医疗创新中心 · 2025</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-card border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fa-solid fa-heart-pulse text-medical-primary text-2xl mr-2"></i>
+                        <span class="font-bold text-xl tracking-tight text-slate-800">AI 慢病管理系统</span>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#pain-points" class="hover:text-medical-primary px-3 py-2 rounded-md text-sm font-medium transition-colors text-slate-600">痛点</a>
+                        <a href="#features" class="hover:text-medical-primary px-3 py-2 rounded-md text-sm font-medium transition-colors text-slate-600">功能</a>
+                        <a href="#architecture" class="hover:text-medical-primary px-3 py-2 rounded-md text-sm font-medium transition-colors text-slate-600">架构</a>
+                        <a href="#quote" class="bg-medical-primary/10 text-medical-primary border border-medical-primary/30 hover:bg-medical-primary/20 px-4 py-2 rounded-full text-sm font-medium transition-all">方案报价</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden hero-bg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <div class="inline-flex items-center px-3 py-1 rounded-full border border-medical-primary/30 bg-medical-primary/10 text-medical-primary text-xs font-medium mb-6 animate-fade-in-up" style="animation-delay: 0.1s;">
+                基于数据库问答的 AI 医疗应用
+            </div>
+            <h1 class="text-4xl md:text-6xl font-bold tracking-tight mb-6 animate-fade-in-up" style="animation-delay: 0.2s;">
+                <span class="block text-slate-800">全流程智能</span>
+                <span class="block gradient-text mt-2">康复与健康管理平台</span>
+            </h1>
+            <p class="mt-4 max-w-2xl mx-auto text-xl text-slate-500 animate-fade-in-up" style="animation-delay: 0.3s;">
+                连接医院数据库，利用 AI 工作流督促锻炼、按时服药，提供 24 小时心理疏导，做患者身边的智能健康管家。
+            </p>
+            <div class="mt-10 flex justify-center gap-4 animate-fade-in-up" style="animation-delay: 0.4s;">
+                <a href="#features" class="px-8 py-3 rounded-lg bg-gradient-to-r from-medical-primary to-medical-secondary text-white font-semibold shadow-lg shadow-medical-primary/25 hover:shadow-medical-primary/40 transition-all transform hover:-translate-y-1">
+                    探索核心功能
+                </a>
+                <a href="#architecture" class="px-8 py-3 rounded-lg glass-card text-slate-700 font-semibold hover:bg-white transition-all">
+                    技术实现架构
+                </a>
+            </div>
+        </div>
+        
+        <!-- Decorative Elements -->
+        <div class="absolute top-1/4 left-10 w-72 h-72 bg-medical-primary/10 rounded-full blur-3xl -z-10 animate-pulse-slow"></div>
+        <div class="absolute bottom-1/4 right-10 w-96 h-96 bg-medical-secondary/10 rounded-full blur-3xl -z-10 animate-pulse-slow" style="animation-delay: 2s;"></div>
+    </section>
+
+    <!-- Pain Points -->
+    <section id="pain-points" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-slate-800">当前慢病管理面临的挑战</h2>
+                <p class="mt-4 text-slate-500">患者依从性差、医护资源紧张是主要痛点</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass-card p-8 rounded-xl border-t-4 border-red-400 hover:shadow-lg transition-all">
+                    <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-person-walking-dashed-line-arrow-right text-red-500 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-2">康复锻炼难坚持</h3>
+                    <p class="text-sm text-slate-500">患者离院后缺乏监督，康复动作不标准或难以坚持，影响预后效果。</p>
+                </div>
+                <div class="glass-card p-8 rounded-xl border-t-4 border-orange-400 hover:shadow-lg transition-all">
+                    <div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-pills text-orange-500 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-2">服药依从性差</h3>
+                    <p class="text-sm text-slate-500">老年患者易漏服、错服药物，且对药物副作用缺乏及时咨询渠道。</p>
+                </div>
+                <div class="glass-card p-8 rounded-xl border-t-4 border-purple-400 hover:shadow-lg transition-all">
+                    <div class="w-12 h-12 bg-purple-50 rounded-full flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-brain text-purple-500 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-2">心理焦虑无处诉</h3>
+                    <p class="text-sm text-slate-500">长期患病导致心理压力大，医护人员精力有限，难以提供持续心理疏导。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Features -->
+    <section id="features" class="py-20 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-slate-800">AI 赋能的三大核心解决方案</h2>
+                <p class="mt-4 text-slate-500">基于大模型与工作流引擎的智能化干预</p>
+            </div>
+
+            <div class="space-y-12">
+                <!-- Feature 1 -->
+                <div class="flex flex-col md:flex-row gap-8 items-center">
+                    <div class="flex-1 order-2 md:order-1">
+                        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                            <div class="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-medium mb-4">
+                                <i class="fa-solid fa-database mr-2"></i> RAG 知识库问答
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4">基于医院数据库的智能问答</h3>
+                            <p class="text-slate-500 mb-6">
+                                系统对接医院内部诊疗指南、药品库与康复手册。患者提问时，AI 检索权威数据库生成准确回答，避免通用大模型的"幻觉"风险。
+                            </p>
+                            <ul class="space-y-2 text-sm text-slate-600">
+                                <li class="flex items-center"><i class="fa-solid fa-check text-medical-primary mr-2"></i> 药品说明书与禁忌症查询</li>
+                                <li class="flex items-center"><i class="fa-solid fa-check text-medical-primary mr-2"></i> 术后注意事项智能检索</li>
+                                <li class="flex items-center"><i class="fa-solid fa-check text-medical-primary mr-2"></i> 检查报告单 AI 解读</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="flex-1 order-1 md:order-2 flex justify-center">
+                        <div class="relative w-full max-w-md aspect-video bg-gradient-to-br from-blue-100 to-white rounded-2xl flex items-center justify-center shadow-inner">
+                            <i class="fa-solid fa-comments-dollar text-blue-500/20 text-9xl absolute"></i>
+                            <i class="fa-solid fa-user-md text-blue-600 text-6xl relative z-10"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="flex flex-col md:flex-row gap-8 items-center">
+                    <div class="flex-1 flex justify-center">
+                        <div class="relative w-full max-w-md aspect-video bg-gradient-to-br from-teal-100 to-white rounded-2xl flex items-center justify-center shadow-inner">
+                            <i class="fa-solid fa-clock text-teal-500/20 text-9xl absolute"></i>
+                            <i class="fa-solid fa-list-check text-teal-600 text-6xl relative z-10"></i>
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                            <div class="inline-flex items-center px-3 py-1 rounded-full bg-teal-50 text-teal-600 text-xs font-medium mb-4">
+                                <i class="fa-solid fa-robot mr-2"></i> AI Agent 工作流
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4">主动式健康督促工作流</h3>
+                            <p class="text-slate-500 mb-6">
+                                不再是被动等待，系统根据医嘱自动生成个性化健康计划。通过微信/短信主动触达，督促患者完成每日任务。
+                            </p>
+                            <ul class="space-y-2 text-sm text-slate-600">
+                                <li class="flex items-center"><i class="fa-solid fa-check text-medical-primary mr-2"></i> <strong>用药提醒：</strong> 定时推送，要求拍照打卡</li>
+                                <li class="flex items-center"><i class="fa-solid fa-check text-medical-primary mr-2"></i> <strong>康复打卡：</strong> 视频跟练，AI 识别动作达标率</li>
+                                <li class="flex items-center"><i class="fa-solid fa-check text-medical-primary mr-2"></i> <strong>异常预警：</strong> 连续未打卡自动通知家属或医生</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="flex flex-col md:flex-row gap-8 items-center">
+                    <div class="flex-1 order-2 md:order-1">
+                        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                            <div class="inline-flex items-center px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-xs font-medium mb-4">
+                                <i class="fa-solid fa-heart mr-2"></i> 情感计算
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-4">7x24小时 AI 心理疏导</h3>
+                            <p class="text-slate-500 mb-6">
+                                经过专业心理语料微调的大模型，能够识别患者情绪波动，提供共情式的对话支持，缓解焦虑与抑郁情绪。
+                            </p>
+                            <ul class="space-y-2 text-sm text-slate-600">
+                                <li class="flex items-center"><i class="fa-solid fa-check text-medical-primary mr-2"></i> 情绪状态每日评估</li>
+                                <li class="flex items-center"><i class="fa-solid fa-check text-medical-primary mr-2"></i> 焦虑/失眠 CBT 认知行为疗法辅助</li>
+                                <li class="flex items-center"><i class="fa-solid fa-check text-medical-primary mr-2"></i> 危机干预自动转接人工服务</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="flex-1 order-1 md:order-2 flex justify-center">
+                        <div class="relative w-full max-w-md aspect-video bg-gradient-to-br from-purple-100 to-white rounded-2xl flex items-center justify-center shadow-inner">
+                            <i class="fa-solid fa-hands-holding-circle text-purple-500/20 text-9xl absolute"></i>
+                            <i class="fa-solid fa-spa text-purple-600 text-6xl relative z-10"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture -->
+    <section id="architecture" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-slate-800">安全合规的技术架构</h2>
+                <p class="mt-4 text-slate-500">数据私有化部署，保障患者隐私安全</p>
+            </div>
+
+            <div class="relative p-8 border border-slate-200 rounded-2xl bg-slate-50">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+                    <!-- Layer 1 -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <div class="text-medical-primary mb-3"><i class="fa-solid fa-mobile-screen text-3xl"></i></div>
+                        <h4 class="font-bold text-slate-800">用户端</h4>
+                        <p class="text-xs text-slate-500 mt-2">微信小程序 / App</p>
+                    </div>
+                    <!-- Layer 2 -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm md:col-span-2 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-medical-primary to-medical-secondary"></div>
+                        <div class="text-medical-secondary mb-3"><i class="fa-solid fa-microchip text-3xl"></i></div>
+                        <h4 class="font-bold text-slate-800">AI 中台 (Brain)</h4>
+                        <div class="flex justify-center gap-4 mt-4">
+                            <span class="px-2 py-1 bg-slate-100 rounded text-xs text-slate-600">意图识别</span>
+                            <span class="px-2 py-1 bg-slate-100 rounded text-xs text-slate-600">RAG 检索</span>
+                            <span class="px-2 py-1 bg-slate-100 rounded text-xs text-slate-600">任务调度</span>
+                        </div>
+                    </div>
+                    <!-- Layer 3 -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <div class="text-slate-600 mb-3"><i class="fa-solid fa-server text-3xl"></i></div>
+                        <h4 class="font-bold text-slate-800">数据层</h4>
+                        <p class="text-xs text-slate-500 mt-2">HIS系统 / 知识库</p>
+                    </div>
+                </div>
+                <div class="mt-8 flex items-center justify-center text-sm text-slate-500">
+                    <i class="fa-solid fa-shield-halved text-green-500 mr-2"></i> 符合三级等保要求，敏感数据本地化存储
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quote -->
+    <section id="quote" class="py-20 bg-slate-900 text-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-medical-primary/10"></div>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <h2 class="text-3xl font-bold mb-8">项目实施与报价估算</h2>
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/10">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x divide-white/10">
+                    <div class="p-4">
+                        <h4 class="text-lg font-semibold text-medical-accent">基础版</h4>
+                        <p class="text-3xl font-bold mt-4">¥ 20-30万</p>
+                        <p class="text-sm text-slate-300 mt-2">包含知识库问答与基础提醒功能</p>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="text-lg font-semibold text-medical-accent">专业版</h4>
+                        <p class="text-3xl font-bold mt-4">¥ 35-50万</p>
+                        <p class="text-sm text-slate-300 mt-2">增加 AI 心理疏导与视频动作识别</p>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="text-lg font-semibold text-medical-accent">实施周期</h4>
+                        <p class="text-3xl font-bold mt-4">2-4 个月</p>
+                        <p class="text-sm text-slate-300 mt-2">需求分析至上线试运行</p>
+                    </div>
+                </div>
+                <div class="mt-8 pt-8 border-t border-white/10 text-sm text-slate-400">
+                    * 以上报价仅供参考，具体费用需根据医院实际数据对接难度与定制化需求评估
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 py-12 text-slate-400 border-t border-slate-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2025 智慧医疗 AI 解决方案. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        function verifyCode() {
+            const codeInput = document.getElementById('access-code');
+            const errorMsg = document.getElementById('error-msg');
+            const overlay = document.getElementById('access-overlay');
+            const code = codeInput.value.trim();
+            
+            // Hardcoded access code
+            if (code === '8888') {
+                // Success
+                overlay.style.opacity = '0';
+                overlay.style.visibility = 'hidden';
+                document.body.classList.remove('overflow-hidden');
+                
+                // Trigger initial animations for hero section after unlock
+                const heroElements = document.querySelectorAll('.hero-bg .animate-fade-in-up');
+                heroElements.forEach(el => {
+                    el.style.animationPlayState = 'running';
+                });
+            } else {
+                // Failure
+                errorMsg.style.opacity = '1';
+                codeInput.parentElement.classList.add('shake');
+                codeInput.classList.add('border-red-500');
+                
+                setTimeout(() => {
+                    codeInput.parentElement.classList.remove('shake');
+                    codeInput.classList.remove('border-red-500');
+                }, 500);
+            }
+        }
+
+        // Simple scroll animation observer
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                        observer.unobserve(entry.target);
+                    }
+                });
+            });
+            
+            // Observe elements if needed, currently handled by class addition
+        });
+    </script>
+</body>
+</html>

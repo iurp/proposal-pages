@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>解决方案演示中心</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-4xl w-full">
+        <div class="text-center mb-16">
+            <h1 class="text-4xl font-bold text-white mb-4">解决方案演示中心</h1>
+            <p class="text-slate-400">请选择要查看的项目方案</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Law Firm -->
+            <a href="/law-firm/" class="glass-card p-8 rounded-2xl group block">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+                        <i class="fa-solid fa-scale-balanced text-blue-400 text-2xl"></i>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-slate-500 group-hover:text-white transition-colors"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-2">律所数字运营系统</h2>
+                <p class="text-slate-400 text-sm">面向律所的案件管理、AI 文书撰写与财务核算一体化平台。</p>
+            </a>
+
+            <!-- Hospital AI -->
+            <a href="/hospital/" class="glass-card p-8 rounded-2xl group block">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="w-12 h-12 bg-teal-500/20 rounded-full flex items-center justify-center group-hover:bg-teal-500/30 transition-colors">
+                        <i class="fa-solid fa-heart-pulse text-teal-400 text-2xl"></i>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-slate-500 group-hover:text-white transition-colors"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-2">智慧医疗 AI 慢病管理</h2>
+                <p class="text-slate-400 text-sm">基于数据库问答与工作流的患者康复管理与心理疏导系统。</p>
+            </a>
+        </div>
+
+        <div class="mt-16 text-center text-slate-500 text-sm">
+            &copy; 2025 Solution Demo Center
+        </div>
+    </div>
+
+</body>
+</html>
